@@ -1,6 +1,7 @@
 "use client";
 
 import { Minus, Plus, ShoppingCart, Trash2 } from "lucide-react";
+import { AnimatePresence, motion } from "motion/react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -43,80 +44,22 @@ export default function CartPage() {
   return (
     <main className="min-h-screen bg-background">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12">
-        <h1 className="text-4xl font-bold mb-8">Shopping Cart</h1>
+        <h1 className="text-4xl font-bold mb-8 text-foreground">
+          Shopping Cart
+        </h1>
 
         <div className="grid lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2 space-y-4">
-            {items.map((item: any) => (
-              <Card key={item.id} className="overflow-hidden">
-                <CardContent className="p-6">
-                  <div className="flex gap-4">
-                    <div className="relative w-24 h-24 shrink-0 bg-muted rounded-lg overflow-hidden">
-                      <Image
-                        src={item.image}
-                        alt={item.title}
-                        fill
-                        className="object-contain p-2"
-                      />
-                    </div>
-
-                    <div className="flex-1">
-                      <Link
-                        href={`/products/${item.id}`}
-                        className="hover:underline transition-colors"
-                      >
-                        <h3 className="font-semibold line-clamp-2 mb-2">
-                          {item.title}
-                        </h3>
-                      </Link>
-                      <p className="text-lg font-bold mb-3">
-                        ${item.price.toFixed(2)}
-                      </p>
-
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center border rounded-lg">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() =>
-                              updateQuantity(item.id, item.quantity - 1)
-                            }
-                          >
-                            <Minus className="w-4 h-4" />
-                          </Button>
-                          <span className="px-3 py-1 font-semibold">
-                            {item.quantity}
-                          </span>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() =>
-                              updateQuantity(item.id, item.quantity + 1)
-                            }
-                          >
-                            <Plus className="w-4 h-4" />
-                          </Button>
-                        </div>
-
-                        <Button
-                          variant="destructive"
-                          size="sm"
-                          onClick={() => removeItem(item.id)}
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
-                      </div>
-                    </div>
-
-                    <div className="text-right">
-                      <p className="text-lg font-bold">
-                        ${(item.price * item.quantity).toFixed(2)}
-                      </p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+            <AnimatePresence>
+              {items.map((item: any) => (
+                <CartProductCard
+                  key={item.id}
+                  item={item}
+                  updateQuantity={updateQuantity}
+                  removeItem={removeItem}
+                />
+              ))}
+            </AnimatePresence>
           </div>
 
           <div>
@@ -162,5 +105,92 @@ export default function CartPage() {
         </div>
       </div>
     </main>
+  );
+}
+
+type CartProductCardProps = {
+  item: any;
+  updateQuantity: (id: number, quantity: number) => void;
+  removeItem: (id: number) => void;
+};
+
+function CartProductCard({
+  item,
+  updateQuantity,
+  removeItem,
+}: CartProductCardProps) {
+  return (
+    <motion.div
+      key={item.id}
+      layout
+      exit={{ opacity: 0, translateX: -100 }}
+      transition={{
+        layout: { duration: 0.2, ease: "easeInOut" },
+        default: { duration: 0.1 },
+      }}
+    >
+      <Card key={item.id} className="overflow-hidden">
+        <CardContent className="p-6">
+          <div className="flex gap-4">
+            <div className="relative w-24 h-24 shrink-0 bg-muted rounded-lg overflow-hidden">
+              <Image
+                src={item.image}
+                alt={item.title}
+                fill
+                className="object-contain p-2"
+              />
+            </div>
+
+            <div className="flex-1">
+              <Link
+                href={`/products/${item.id}`}
+                className="hover:underline transition-colors"
+              >
+                <h3 className="font-semibold line-clamp-2 mb-2">
+                  {item.title}
+                </h3>
+              </Link>
+              <p className="text-lg font-bold mb-3">${item.price.toFixed(2)}</p>
+
+              <div className="flex items-center justify-between">
+                <div className="flex items-center border rounded-lg">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                  >
+                    <Minus className="size-4" />
+                  </Button>
+                  <span className="px-3 py-1 font-semibold">
+                    {item.quantity}
+                  </span>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                  >
+                    <Plus className="size-4" />
+                  </Button>
+                </div>
+              </div>
+            </div>
+
+            <div className="text-right flex flex-col justify-between items-end">
+              <p className="text-lg font-bold">
+                ${(item.price * item.quantity).toFixed(2)}
+              </p>
+              <Button
+                variant="destructive"
+                size="sm"
+                className="w-8"
+                onClick={() => removeItem(item.id)}
+              >
+                <Trash2 className="size-4" />
+              </Button>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    </motion.div>
   );
 }

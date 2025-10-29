@@ -147,7 +147,7 @@ export default function ProductPage() {
                       size="sm"
                       onClick={() => setQuantity(Math.max(1, quantity - 1))}
                     >
-                      <Minus className="w-4 h-4" />
+                      <Minus className="size-4" />
                     </Button>
                     <span className="px-2 font-semibold">{quantity}</span>
                     <Button
@@ -155,7 +155,7 @@ export default function ProductPage() {
                       size="sm"
                       onClick={() => setQuantity(quantity + 1)}
                     >
-                      <Plus className="w-4 h-4" />
+                      <Plus className="size-4" />
                     </Button>
                   </div>
                 </div>

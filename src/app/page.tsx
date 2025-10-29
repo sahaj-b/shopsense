@@ -2,7 +2,6 @@
 
 import { AnimatePresence, motion } from "framer-motion";
 import { useSearchParams } from "next/navigation";
-import { ViewTransition } from "react";
 import { ProductCard } from "@/components/product-card";
 import { searchProducts } from "@/lib/api";
 import { useProducts } from "@/lib/queries";
