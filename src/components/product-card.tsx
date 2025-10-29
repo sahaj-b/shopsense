@@ -7,7 +7,7 @@ import { startTransition, ViewTransition } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import type { Product } from "@/lib/api";
-import { PRODUCT_DETAIL_QUERY_KEY, useCart } from "@/lib/queries";
+import { useCart } from "@/lib/queries";
 import { useFlyToCart } from "@/hooks/useFlyToCart";
 
 interface ProductCardProps {
@@ -27,16 +27,19 @@ export function ProductCard({ product }: ProductCardProps) {
 
   const handleAddToCart = () => {
     addItem({
-      id: product.id,
-      title: product.title,
-      price: product.price,
-      image: product.image,
+      product: {
+        id: product.id,
+        title: product.title,
+        price: product.price,
+        image: product.image,
+      },
+      quantity: 1,
     });
     triggerAnimation();
   };
 
   const handleProductClick = () => {
-    queryClient.setQueryData(PRODUCT_DETAIL_QUERY_KEY(product.id), product);
+    queryClient.setQueryData(["product", product.id], product);
     startTransition(() => {});
   };
 

@@ -345,6 +345,30 @@
   [tabindex]:not([tabindex="-1"]) {
     cursor: pointer;
   }
+
+  ::-webkit-scrollbar {
+    width: 12px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: oklch(0.7871 0.1187 304.7693);
+    border-radius: 4px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: oklch(0.7871 0.1187 304.7693);
+    opacity: 0.8;
+    border-radius: 4px;
+  }
+
+  html {
+    scrollbar-color: oklch(0.7871 0.1187 304.7693) oklch(0.2155 0.0254 284.0647);
+  }
 }
 
 ::view-transition-group(root),

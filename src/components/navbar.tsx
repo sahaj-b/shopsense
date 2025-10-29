@@ -137,7 +137,7 @@ export function Navbar() {
                 <Button variant="outline" className="relative" data-cart-icon>
                   <ShoppingCart className="w-5 h-5" />
                   {itemCount > 0 && (
-                    <span className="absolute top-0 right-0 inline-flex items-center justify-center px-1.5 py-1 text-xs font-bold leading-none text-background transform translate-x-1/2 -translate-y-1/2 bg-destructive rounded-full">
+                    <span className="absolute top-0 right-0 inline-flex items-center justify-center px-[.38rem] py-1 text-xs font-bold leading-none text-background transform translate-x-1/2 -translate-y-1/2 bg-destructive rounded-full">
                       {itemCount}
                     </span>
                   )}

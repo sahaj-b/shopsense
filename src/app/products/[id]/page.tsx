@@ -63,13 +63,17 @@ export default function ProductPage() {
   }
 
   const handleAddToCart = () => {
-    for (let i = 0; i < quantity; i++) {
-      addItem({
+    console.log("handleAddToCart called with quantity:", quantity);
+    addItem({
+      product: {
         id: product.id,
         title: product.title,
         price: product.price,
         image: product.image,
-      });
+      },
+      quantity,
+    });
+    for (let i = 0; i < quantity; i++) {
       setTimeout(() => triggerAnimation(), i * 60);
     }
     setQuantity(1);

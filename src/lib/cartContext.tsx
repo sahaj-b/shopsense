@@ -12,7 +12,7 @@ export interface CartItem {
 
 interface CartContextType {
   items: CartItem[];
-  addItem: (product: Omit<CartItem, "quantity">) => void;
+  addItem: (product: Omit<CartItem, "quantity">, quantity?: number) => void;
   removeItem: (id: number) => void;
   updateQuantity: (id: number, quantity: number) => void;
   clearCart: () => void;
@@ -40,17 +40,26 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     }
   }, [items, isHydrated]);
 
-  const addItem = (product: Omit<CartItem, "quantity">) => {
+  const addItem = (
+    product: Omit<CartItem, "quantity">,
+    quantity: number = 1,
+  ) => {
+    console.log("addItem called with quantity:", quantity);
     setItems((prev) => {
       const existing = prev.find((item) => item.id === product.id);
+      console.log("existing item:", existing);
       if (existing) {
-        return prev.map((item) =>
+        const updated = prev.map((item) =>
           item.id === product.id
-            ? { ...item, quantity: item.quantity + 1 }
-            : item
+            ? { ...item, quantity: item.quantity + quantity }
+            : item,
         );
+        console.log("updated items:", updated);
+        return updated;
       }
-      return [...prev, { ...product, quantity: 1 }];
+      const newItems = [...prev, { ...product, quantity }];
+      console.log("new items:", newItems);
+      return newItems;
     });
   };
 
@@ -64,9 +73,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       return;
     }
     setItems((prev) =>
-      prev.map((item) =>
-        item.id === id ? { ...item, quantity } : item
-      )
+      prev.map((item) => (item.id === id ? { ...item, quantity } : item)),
     );
   };
 
@@ -74,7 +81,10 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     setItems([]);
   };
 
-  const total = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const total = items.reduce(
+    (sum, item) => sum + item.price * item.quantity,
+    0,
+  );
   const itemCount = items.reduce((count, item) => count + item.quantity, 0);
 
   return (

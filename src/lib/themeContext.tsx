@@ -16,9 +16,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     setMounted(true);
     const stored = localStorage.getItem("theme") as "light" | "dark" | null;
-    const isDark =
-      stored === "dark" ||
-      (!stored && window.matchMedia("(prefers-color-scheme: dark)").matches);
+    const isDark = stored !== "light";
     const initialTheme = isDark ? "dark" : "light";
     setTheme(initialTheme);
     localStorage.setItem("theme", initialTheme);
