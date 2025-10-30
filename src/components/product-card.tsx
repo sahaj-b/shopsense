@@ -1,13 +1,12 @@
 "use client";
 
-import { useQueryClient } from "@tanstack/react-query";
 import Image from "next/image";
 import Link from "next/link";
-import { startTransition, ViewTransition } from "react";
+import { ViewTransition } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import type { Product } from "@/lib/api";
-import { useCart } from "@/lib/queries";
+import type { Product } from "@/lib/query";
+import { useCart } from "@/lib/cartContext";
 import { useFlyToCart } from "@/hooks/useFlyToCart";
 
 interface ProductCardProps {
@@ -16,7 +15,6 @@ interface ProductCardProps {
 
 export function ProductCard({ product }: ProductCardProps) {
   const { addItem } = useCart();
-  const queryClient = useQueryClient();
   const {
     buttonRef,
     animatingElements,
@@ -26,30 +24,21 @@ export function ProductCard({ product }: ProductCardProps) {
   } = useFlyToCart();
 
   const handleAddToCart = () => {
-    addItem({
-      product: {
+    addItem(
+      {
         id: product.id,
         title: product.title,
         price: product.price,
         image: product.image,
       },
-      quantity: 1,
-    });
+      1,
+    );
     triggerAnimation();
-  };
-
-  const handleProductClick = () => {
-    queryClient.setQueryData(["product", product.id], product);
-    startTransition(() => {});
   };
 
   return (
     <Card className="flex flex-col h-full overflow-hidden hover:shadow-lg transition-shadow">
-      <Link
-        href={`/products/${product.id}`}
-        onClick={handleProductClick}
-        className="shrink-0"
-      >
+      <Link href={`/products/${product.id}`} className="shrink-0">
         <ViewTransition name={`product-image-${product.id}`}>
           <div className="relative h-56 w-full bg-muted overflow-hidden">
             <Image

@@ -8,14 +8,15 @@ import { useEffect, useState, ViewTransition } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useFlyToCart } from "@/hooks/useFlyToCart";
-import { useCart, useProductById } from "@/lib/queries";
+import { useCart } from "@/lib/cartContext";
+import { useProductById, type Product } from "@/lib/query";
 
 export default function ProductPage() {
   const params = useParams();
   const id = Number(params.id);
-  const { data: product, isLoading, error } = useProductById(id);
   const { addItem } = useCart();
   const [quantity, setQuantity] = useState(1);
+  const { data: product, isLoading, error } = useProductById(id);
   const {
     buttonRef,
     animatingElements,
@@ -54,7 +55,9 @@ export default function ProductPage() {
   if (error || !product) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center gap-4 py-12">
-        <p className="text-lg text-muted-foreground">Product not found</p>
+        <p className="text-lg text-muted-foreground">
+          {error ? "Failed to load product" : "Product not found"}
+        </p>
         <Link href="/">
           <Button>Back to Shop</Button>
         </Link>
@@ -63,16 +66,15 @@ export default function ProductPage() {
   }
 
   const handleAddToCart = () => {
-    console.log("handleAddToCart called with quantity:", quantity);
-    addItem({
-      product: {
-        id: product.id,
-        title: product.title,
-        price: product.price,
-        image: product.image,
+    addItem(
+      {
+        id: product!.id,
+        title: product!.title,
+        price: product!.price,
+        image: product!.image,
       },
       quantity,
-    });
+    );
     for (let i = 0; i < quantity; i++) {
       setTimeout(() => triggerAnimation(), i * 60);
     }
