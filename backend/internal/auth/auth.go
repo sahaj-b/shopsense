@@ -1,6 +1,7 @@
 package auth
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -107,7 +108,6 @@ func (a *Auth) Register(c *gin.Context) {
 	}
 
 	if err := a.db.Create(user).Error; err != nil {
-		log.Printf("DB create error: %v", err)
 		if err.Error() == "UNIQUE constraint failed: users.email" {
 			c.JSON(http.StatusConflict, gin.H{"error": "Email already exists"})
 		} else {
@@ -122,7 +122,7 @@ func (a *Auth) Register(c *gin.Context) {
 	session.Values["name"] = user.Name
 	session.Save(c.Request, c.Writer)
 
-	log.Printf("User %s registered", user.Email)
+	log.Printf("User %s registered - Stored user_id: %v", user.Email, user.ID)
 	c.JSON(http.StatusCreated, gin.H{
 		"message": "Registration successful",
 		"user":    gin.H{"id": user.ID, "email": user.Email, "name": user.Name},
@@ -155,7 +155,7 @@ func (a *Auth) Login(c *gin.Context) {
 	session.Values["name"] = user.Name
 	session.Save(c.Request, c.Writer)
 
-	log.Printf("User %s logged in", user.Email)
+	log.Printf("User %s logged in - Stored user_id: %v (type: %T)", user.Email, user.ID, user.ID)
 	c.JSON(http.StatusOK, gin.H{
 		"message": "Login successful",
 		"user":    gin.H{"id": user.ID, "email": user.Email, "name": user.Name},
@@ -178,13 +178,34 @@ func (a *Auth) Middleware() gin.HandlerFunc {
 			return
 		}
 
-		userID, ok := session.Values["user_id"].(string)
-		if !ok || userID == "" {
+		userIDRaw := session.Values["user_id"]
+		log.Printf("[Middleware] Session user_id raw value: %v", userIDRaw)
+
+		userID, ok := userIDRaw.(string)
+		if !ok {
+			log.Printf("[Middleware] Failed type assertion to string. Attempting alternative types...")
+			if intID, intOk := userIDRaw.(uint); intOk {
+				userID = fmt.Sprintf("%d", intID)
+				log.Printf("[Middleware] Successfully converted uint to string: %s", userID)
+			} else if intID64, intOk := userIDRaw.(int64); intOk {
+				userID = fmt.Sprintf("%d", intID64)
+				log.Printf("[Middleware] Successfully converted int64 to string: %s", userID)
+			} else {
+				log.Printf("[Middleware] Could not convert user_id to string. Type: %T", userIDRaw)
+				c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+				c.Abort()
+				return
+			}
+		}
+
+		if userID == "" {
+			log.Printf("[Middleware] user_id is empty string")
 			c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
 			c.Abort()
 			return
 		}
 
+		log.Printf("[Middleware] User authenticated with ID: %s", userID)
 		c.Set("user_id", userID)
 		c.Set("email", session.Values["email"])
 		c.Set("name", session.Values["name"])

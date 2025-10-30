@@ -23,55 +23,10 @@ Content-Type: {{contentType}}
   "password": "password123"
 }
 
-### Login with Wrong Password
-POST {{baseUrl}}/auth/login
-Content-Type: {{contentType}}
-
-{
-  "email": "user@example.com",
-  "password": "wrongpassword"
-}
-
-### Login Non-existent User
-POST {{baseUrl}}/auth/login
-Content-Type: {{contentType}}
-
-{
-  "email": "nonexistent@example.com",
-  "password": "password123"
-}
-
-### Cart
-GET {{baseUrl}}/cart
-
 ### Logout
 POST {{baseUrl}}/auth/logout
 Content-Type: {{contentType}}
 
-### Test Invalid Email Format
-POST {{baseUrl}}/auth/register
-Content-Type: {{contentType}}
+### Cart
+GET {{baseUrl}}/cart
 
-{
-  "email": "invalid-email",
-  "password": "password123",
-  "name": "Bad Email"
-}
-
-### Test Short Password
-POST {{baseUrl}}/auth/register
-Content-Type: {{contentType}}
-
-{
-  "email": "test@example.com",
-  "password": "short",
-  "name": "Short Pass"
-}
-
-### Test Missing Fields
-POST {{baseUrl}}/auth/register
-Content-Type: {{contentType}}
-
-{
-  "email": "test@example.com"
-}
