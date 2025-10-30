@@ -9,13 +9,15 @@ import (
 
 	_ "github.com/joho/godotenv/autoload"
 
+	"backend/internal/auth"
 	"backend/internal/database"
+	"gorm.io/gorm"
 )
 
 type Server struct {
 	port int
-
-	db database.Service
+	db   *gorm.DB
+	auth *auth.Auth
 }
 
 func NewServer() *http.Server {
@@ -24,7 +26,7 @@ func NewServer() *http.Server {
 		port: port,
 		db:   database.New(),
 	}
-
+	NewServer.auth = auth.NewAuth(NewServer.db)
 	server := &http.Server{
 		Addr:         fmt.Sprintf(":%d", NewServer.port),
 		Handler:      NewServer.RegisterRoutes(),

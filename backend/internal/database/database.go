@@ -2,79 +2,89 @@ package database
 
 import (
 	"context"
-	"database/sql"
 	"fmt"
 	"log"
 	"os"
+	"path/filepath"
 	"strconv"
 	"time"
 
 	_ "github.com/joho/godotenv/autoload"
-	_ "github.com/mattn/go-sqlite3"
+	"gorm.io/driver/sqlite"
+	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 )
 
-// Service represents a service that interacts with a database.
-type Service interface {
-	// Health returns a map of health status information.
-	// The keys and values in the map are service-specific.
-	Health() map[string]string
-
-	// Close terminates the database connection.
-	// It returns an error if the connection cannot be closed.
-	Close() error
-}
-
-type service struct {
-	db *sql.DB
+type User struct {
+	ID           string `gorm:"primaryKey"`
+	Email        string `gorm:"uniqueIndex;not null"`
+	PasswordHash string `gorm:"not null"`
+	Name         string
+	CreatedAt    time.Time
+	UpdatedAt    time.Time
 }
 
 var (
-	dburl      = os.Getenv("BLUEPRINT_DB_URL")
-	dbInstance *service
+	dburl      = os.Getenv("DB_URL")
+	dbInstance *gorm.DB
 )
 
-func New() Service {
-	// Reuse Connection
+func New() *gorm.DB {
 	if dbInstance != nil {
 		return dbInstance
 	}
 
-	db, err := sql.Open("sqlite3", dburl)
-	if err != nil {
-		// This will not be a connection error, but a DSN parse error or
-		// another initialization error.
-		log.Fatal(err)
+	dbPath := dburl
+	if !filepath.IsAbs(dbPath) {
+		wd, err := os.Getwd()
+		if err != nil {
+			log.Fatalf("failed to get working directory: %v", err)
+		}
+		dbPath = filepath.Join(wd, dbPath)
 	}
 
-	dbInstance = &service{
-		db: db,
+	db, err := gorm.Open(sqlite.Open(dbPath+"?mode=rwc&cache=shared"), &gorm.Config{
+		Logger: logger.Default.LogMode(logger.Info),
+	})
+	if err != nil {
+		log.Fatalf("failed to connect to database: %v", err)
 	}
+
+	dbInstance = db
+
+	if err := db.AutoMigrate(&User{}); err != nil {
+		log.Printf("migration error: %v", err)
+	}
+
 	return dbInstance
 }
 
-// Health checks the health of the database connection by pinging the database.
-// It returns a map with keys indicating various health statistics.
-func (s *service) Health() map[string]string {
+func Health() map[string]string {
 	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
 	defer cancel()
 
 	stats := make(map[string]string)
 
-	// Ping the database
-	err := s.db.PingContext(ctx)
+	sqlDB, err := dbInstance.DB()
 	if err != nil {
 		stats["status"] = "down"
-		stats["error"] = fmt.Sprintf("db down: %v", err)
-		log.Fatalf("db down: %v", err) // Log the error and terminate the program
+		stats["error"] = fmt.Sprintf("failed to get underlying sql.DB: %v", err)
+		log.Fatalf("db down: %v", err)
 		return stats
 	}
 
-	// Database is up, add more statistics
+	err = sqlDB.PingContext(ctx)
+	if err != nil {
+		stats["status"] = "down"
+		stats["error"] = fmt.Sprintf("db down: %v", err)
+		log.Fatalf("db down: %v", err)
+		return stats
+	}
+
 	stats["status"] = "up"
 	stats["message"] = "It's healthy"
 
-	// Get database stats (like open connections, in use, idle, etc.)
-	dbStats := s.db.Stats()
+	dbStats := sqlDB.Stats()
 	stats["open_connections"] = strconv.Itoa(dbStats.OpenConnections)
 	stats["in_use"] = strconv.Itoa(dbStats.InUse)
 	stats["idle"] = strconv.Itoa(dbStats.Idle)
@@ -83,8 +93,7 @@ func (s *service) Health() map[string]string {
 	stats["max_idle_closed"] = strconv.FormatInt(dbStats.MaxIdleClosed, 10)
 	stats["max_lifetime_closed"] = strconv.FormatInt(dbStats.MaxLifetimeClosed, 10)
 
-	// Evaluate stats to provide a health message
-	if dbStats.OpenConnections > 40 { // Assuming 50 is the max for this example
+	if dbStats.OpenConnections > 40 {
 		stats["message"] = "The database is experiencing heavy load."
 	}
 
@@ -103,11 +112,11 @@ func (s *service) Health() map[string]string {
 	return stats
 }
 
-// Close closes the database connection.
-// It logs a message indicating the disconnection from the specific database.
-// If the connection is successfully closed, it returns nil.
-// If an error occurs while closing the connection, it returns the error.
-func (s *service) Close() error {
+func Close() error {
 	log.Printf("Disconnected from database: %s", dburl)
-	return s.db.Close()
+	sqlDB, err := dbInstance.DB()
+	if err != nil {
+		return err
+	}
+	return sqlDB.Close()
 }
