@@ -8,7 +8,7 @@ import { useRouter } from "next/navigation";
 import { useState, ViewTransition } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useCart } from "@/lib/queries";
+import { useCart } from "@/lib/cartContext";
 
 export default function CartPage() {
   const { items, removeItem, updateQuantity, total, clearCart } = useCart();

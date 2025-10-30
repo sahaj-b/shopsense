@@ -1,9 +1,9 @@
 "use client";
 
-import { Menu, Moon, Search, ShoppingCart, Sun, X } from "lucide-react";
+import { Moon, Search, ShoppingCart, Sun, X } from "lucide-react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useState, useRef } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   InputGroup,
@@ -12,7 +12,7 @@ import {
   InputGroupInput,
 } from "@/components/ui/input-group";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { useCart } from "@/lib/queries";
+import { useCart } from "@/lib/cartContext";
 import { useTheme } from "@/lib/themeContext";
 
 export function Navbar() {
@@ -41,7 +41,7 @@ export function Navbar() {
 
   return (
     <>
-      <nav className="fixed w-full top-0 z-50 border-b bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60">
+      <nav className="fixed w-screen top-0 z-50 border-b bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex h-16 items-center justify-between gap-4">
             <Link href="/" className="flex items-center font-bold text-xl">

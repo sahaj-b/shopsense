@@ -1,14 +1,12 @@
 import { QueryClient, useQuery } from "@tanstack/react-query";
 
-export function createQueryClient() {
-  return new QueryClient({
-    defaultOptions: {
-      queries: {
-        staleTime: 60 * 60 * 1000,
-      },
+export const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 60 * 60 * 1000,
     },
-  });
-}
+  },
+});
 
 export interface Product {
   id: number;
@@ -43,6 +41,14 @@ export function useProductById(id: number) {
       const res = await fetch(`${API_URL}/products/${id}`);
       if (!res.ok) throw new Error("Failed to fetch product");
       return res.json();
+    },
+    initialData: () => {
+      return queryClient
+        .getQueryData<Product[]>(["products"])
+        ?.find((p) => p.id === id);
+    },
+    initialDataUpdatedAt: () => {
+      return queryClient.getQueryState(["products"])?.dataUpdatedAt;
     },
   });
 }

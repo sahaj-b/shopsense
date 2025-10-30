@@ -1,6 +1,5 @@
 "use client";
 
-import { Suspense } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ProductCard } from "@/components/product-card";
@@ -15,7 +14,6 @@ import { StarRating } from "@/components/ui/star-rating";
 import { useFilteredProducts } from "@/hooks/useFilteredProducts";
 import { useCategories, useProducts } from "@/lib/query";
 
-// --- Filters Component ---
 type FiltersProps = {
   categories?: string[];
   category: string | null;
@@ -26,7 +24,7 @@ type FiltersProps = {
   onCategoryChange: (selectedCategory: string) => void;
 };
 
-function HomeContent() {
+export default function Home() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const { data: products, isLoading, error } = useProducts();
@@ -102,14 +100,6 @@ function HomeContent() {
         )}
       </div>
     </main>
-  );
-}
-
-export default function Home() {
-  return (
-    <Suspense fallback={<HomeSkeleton />}>
-      <HomeContent />
-    </Suspense>
   );
 }
 

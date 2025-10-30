@@ -5,9 +5,9 @@ import Link from "next/link";
 import { ViewTransition } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import type { Product } from "@/lib/query";
-import { useCart } from "@/lib/cartContext";
 import { useFlyToCart } from "@/hooks/useFlyToCart";
+import { useCart } from "@/lib/cartContext";
+import type { Product } from "@/lib/query";
 
 interface ProductCardProps {
   product: Product;

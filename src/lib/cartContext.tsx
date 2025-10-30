@@ -28,37 +28,29 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const stored = localStorage.getItem("cart");
-    if (stored) {
-      setItems(JSON.parse(stored));
-    }
+    if (stored) setItems(JSON.parse(stored));
     setIsHydrated(true);
   }, []);
 
   useEffect(() => {
-    if (isHydrated) {
-      localStorage.setItem("cart", JSON.stringify(items));
-    }
+    if (isHydrated) localStorage.setItem("cart", JSON.stringify(items));
   }, [items, isHydrated]);
 
   const addItem = (
     product: Omit<CartItem, "quantity">,
     quantity: number = 1,
   ) => {
-    console.log("addItem called with quantity:", quantity);
     setItems((prev) => {
       const existing = prev.find((item) => item.id === product.id);
-      console.log("existing item:", existing);
       if (existing) {
         const updated = prev.map((item) =>
           item.id === product.id
             ? { ...item, quantity: item.quantity + quantity }
             : item,
         );
-        console.log("updated items:", updated);
         return updated;
       }
       const newItems = [...prev, { ...product, quantity }];
-      console.log("new items:", newItems);
       return newItems;
     });
   };
