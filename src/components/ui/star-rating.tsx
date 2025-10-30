@@ -20,7 +20,7 @@ export function StarRating({ value, onChange, maxStars = 5 }: StarRatingProps) {
             <Star
               className={`w-5 h-5 transition-colors group-hover:text-yellow-200/40 group-hover:fill-yellow-200/40 group-hover:scale-105 ${
                 starValue <= value
-                  ? "fill-yellow-200 text-yellow-200"
+                  ? "fill-yellow-400 text-yellow-400 dark:fill-yellow-200 dark:text-yellow-200"
                   : "text-muted-foreground"
               }`}
             />

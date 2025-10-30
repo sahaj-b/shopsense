@@ -2,7 +2,7 @@
 
 import { AnimatePresence, motion } from "framer-motion";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Suspense, useMemo } from "react";
+import { useMemo } from "react";
 import { ProductCard } from "@/components/product-card";
 import {
   Select,

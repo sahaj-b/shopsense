@@ -3,7 +3,7 @@
 import { Menu, Moon, Search, ShoppingCart, Sun, X } from "lucide-react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import {
   InputGroup,
@@ -23,11 +23,13 @@ export function Navbar() {
   const [searchQuery, setSearchQuery] = useState("");
   const router = useRouter();
   const [searchFocus, setSearchFocus] = useState(false);
+  const [sheetOpen, setSheetOpen] = useState(false);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchQuery.trim()) {
       router.push(`/?search=${encodeURIComponent(searchQuery)}`);
+      setSheetOpen(false);
     }
   };
 
@@ -95,15 +97,24 @@ export function Navbar() {
                   <Sun className="h-5 w-5" />
                 )}
               </Button>
-              <Sheet>
+              <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
                 <SheetTrigger asChild>
                   <Button variant="outline" size="icon" className="md:hidden">
-                    <Menu className="w-5 h-5 dark:text-foreground" />
+                    <Search className="w-5 h-5 dark:text-foreground" />
                   </Button>
                 </SheetTrigger>
-                <SheetContent side="left">
-                  <div className="flex flex-col gap-4 mt-8">
-                    <form onSubmit={handleSearch} className="flex gap-2">
+                <SheetContent
+                  side="left"
+                  className={theme === "dark" ? "dark" : ""}
+                >
+                  <div className="flex flex-col gap-6">
+                    <h2 className="text-lg font-semibold text-foreground">
+                      Menu
+                    </h2>
+                    <form
+                      onSubmit={handleSearch}
+                      className="flex flex-col gap-3"
+                    >
                       <InputGroup className="flex-1">
                         <InputGroupInput
                           placeholder="Search products..."
