@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { NavbarWrapper } from "@/components/navbar-wrapper";
 import { QueryProvider } from "@/components/query-provider";
+import { AuthProvider } from "@/lib/authContext";
 import { CartProvider } from "@/lib/cartContext";
 import { ThemeProvider } from "@/lib/themeContext";
 
@@ -32,12 +33,14 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-background text-foreground`}
       >
         <QueryProvider>
-          <CartProvider>
-            <ThemeProvider>
-              <NavbarWrapper />
-              {children}
-            </ThemeProvider>
-          </CartProvider>
+          <AuthProvider>
+            <CartProvider>
+              <ThemeProvider>
+                <NavbarWrapper />
+                {children}
+              </ThemeProvider>
+            </CartProvider>
+          </AuthProvider>
         </QueryProvider>
       </body>
     </html>

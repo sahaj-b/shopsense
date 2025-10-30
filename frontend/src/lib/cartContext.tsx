@@ -1,6 +1,8 @@
 "use client";
 
 import { createContext, useContext, useEffect, useState } from "react";
+import { useAuth } from "./authContext";
+import { getCartItemsApi, setCartItemsApi } from "./cart.service";
 
 export interface CartItem {
   id: number;
@@ -24,17 +26,50 @@ const CartContext = createContext<CartContextType | undefined>(undefined);
 
 export function CartProvider({ children }: { children: React.ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([]);
-  const [isHydrated, setIsHydrated] = useState(false);
+  const [initiated, setInitiated] = useState(false);
+  const [retryCount, setRetryCount] = useState(0);
+  const { user } = useAuth();
 
   useEffect(() => {
     const stored = localStorage.getItem("cart");
     if (stored) setItems(JSON.parse(stored));
-    setIsHydrated(true);
   }, []);
 
   useEffect(() => {
-    if (isHydrated) localStorage.setItem("cart", JSON.stringify(items));
-  }, [items, isHydrated]);
+    if (user) {
+      getCartItemsApi()
+        .then((apiItems) => {
+          setItems(apiItems);
+          setInitiated(true);
+        })
+        .catch((err) => {
+          console.error("Failed to fetch cart items from API:", err);
+          if (retryCount < 3) {
+            setRetryCount((prev) => prev + 1);
+            console.log("Retrying fetch cart items, attempt:", retryCount + 1);
+            return;
+          } else {
+            setInitiated(true);
+          }
+        });
+    }
+    setInitiated(true);
+  }, [user, retryCount]);
+
+  useEffect(() => {
+    localStorage.setItem("cart", JSON.stringify(items));
+    let timeoutId: NodeJS.Timeout | undefined;
+    if (initiated && user) {
+      timeoutId = setTimeout(() => {
+        setCartItemsApi(items).catch((err) => {
+          console.error("Failed to update cart items to API:", err);
+        });
+      }, 2000);
+    }
+    return () => {
+      if (timeoutId) clearTimeout(timeoutId);
+    };
+  }, [items, user, initiated]);
 
   const addItem = (
     product: Omit<CartItem, "quantity">,

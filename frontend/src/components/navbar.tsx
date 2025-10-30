@@ -1,6 +1,6 @@
 "use client";
 
-import { Moon, Search, ShoppingCart, Sun, X } from "lucide-react";
+import { LogOut, Menu, Moon, Search, ShoppingCart, Sun, X } from "lucide-react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
@@ -12,18 +12,23 @@ import {
   InputGroupInput,
 } from "@/components/ui/input-group";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { useAuth } from "@/lib/authContext";
 import { useCart } from "@/lib/cartContext";
 import { useTheme } from "@/lib/themeContext";
+import { LoginModal, RegisterModal } from "./auth-modals";
 
 export function Navbar() {
   const searchParams = useSearchParams();
   const search = searchParams.get("search");
   const { itemCount } = useCart();
   const { theme, toggleTheme } = useTheme();
+  const { user, logout } = useAuth();
   const [searchQuery, setSearchQuery] = useState("");
   const router = useRouter();
   const [searchFocus, setSearchFocus] = useState(false);
   const [sheetOpen, setSheetOpen] = useState(false);
+  const [loginOpen, setLoginOpen] = useState(false);
+  const [registerOpen, setRegisterOpen] = useState(false);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -37,6 +42,15 @@ export function Navbar() {
     setSearchQuery("");
     setSearchFocus(false);
     router.push("/");
+  };
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      router.refresh();
+    } catch (err) {
+      console.error("Logout failed:", err);
+    }
   };
 
   return (
@@ -100,7 +114,7 @@ export function Navbar() {
               <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
                 <SheetTrigger asChild>
                   <Button variant="outline" size="icon" className="md:hidden">
-                    <Search className="w-5 h-5 dark:text-foreground" />
+                    <Menu className="w-5 h-5 dark:text-foreground" />
                   </Button>
                 </SheetTrigger>
                 <SheetContent
@@ -140,6 +154,46 @@ export function Navbar() {
                         Search
                       </Button>
                     </form>
+                    <div className="border-t pt-4 flex flex-col gap-2">
+                      {user ? (
+                        <>
+                          <p className="text-sm text-muted-foreground">
+                            Signed in as {user.name}
+                          </p>
+                          <Button
+                            onClick={handleLogout}
+                            variant="destructive"
+                            className="w-full"
+                          >
+                            <LogOut className="h-4 w-4 mr-2" />
+                            Logout
+                          </Button>
+                        </>
+                      ) : (
+                        <>
+                          <Button
+                            onClick={() => {
+                              setLoginOpen(true);
+                              setSheetOpen(false);
+                            }}
+                            variant="default"
+                            className="w-full"
+                          >
+                            Login
+                          </Button>
+                          <Button
+                            onClick={() => {
+                              setRegisterOpen(true);
+                              setSheetOpen(false);
+                            }}
+                            variant="outline"
+                            className="w-full"
+                          >
+                            Sign Up
+                          </Button>
+                        </>
+                      )}
+                    </div>
                   </div>
                 </SheetContent>
               </Sheet>
@@ -154,11 +208,42 @@ export function Navbar() {
                   )}
                 </Button>
               </Link>
+
+              {user ? (
+                <Button
+                  onClick={handleLogout}
+                  variant="ghost"
+                  size="sm"
+                  className="hidden sm:flex gap-2"
+                >
+                  <LogOut className="h-4 w-4" />
+                  <span className="hidden lg:inline">Logout</span>
+                </Button>
+              ) : (
+                <div className="hidden sm:flex gap-2">
+                  <Button
+                    onClick={() => setLoginOpen(true)}
+                    variant="ghost"
+                    size="sm"
+                  >
+                    Login
+                  </Button>
+                  <Button
+                    onClick={() => setRegisterOpen(true)}
+                    variant="default"
+                    size="sm"
+                  >
+                    Sign Up
+                  </Button>
+                </div>
+              )}
             </div>
           </div>
         </div>
       </nav>
       <div className="h-[4.1rem] bg-background"></div>
+      <LoginModal open={loginOpen} onOpenChange={setLoginOpen} />
+      <RegisterModal open={registerOpen} onOpenChange={setRegisterOpen} />
     </>
   );
 }
