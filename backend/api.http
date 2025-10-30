@@ -1,12 +1,10 @@
 @baseUrl = http://localhost:3001
-@contentType = application/json
 
 ### Health Check
 GET {{baseUrl}}/health
 
 ### Register New User
 POST {{baseUrl}}/auth/register
-Content-Type: {{contentType}}
 
 {
   "email": "user@example.com",
@@ -16,17 +14,26 @@ Content-Type: {{contentType}}
 
 ### Login User
 POST {{baseUrl}}/auth/login
-Content-Type: {{contentType}}
 
 {
-  "email": "user@example.com",
-  "password": "password123"
+  "email": "h@h.com",
+  "password": "hhhhhh"
 }
 
 ### Logout
 POST {{baseUrl}}/auth/logout
-Content-Type: {{contentType}}
 
-### Cart
+### Get Cart
 GET {{baseUrl}}/cart
 
+### Set Cart
+POST {{baseUrl}}/cart
+
+{
+  "cartItems": [
+    {
+      "productId": 2,
+      "quantity": 2
+    }
+  ]
+}

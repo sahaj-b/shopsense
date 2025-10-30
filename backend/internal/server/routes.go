@@ -18,8 +18,6 @@ func (s *Server) RegisterRoutes() http.Handler {
 		AllowCredentials: true,
 	}))
 
-	r.GET("/", s.HelloWorldHandler)
-
 	r.GET("/health", s.healthHandler)
 	r.POST("/auth/register", s.auth.Register)
 	r.POST("/auth/login", s.auth.Login)
@@ -27,28 +25,12 @@ func (s *Server) RegisterRoutes() http.Handler {
 
 	protected := r.Group("/")
 	protected.Use(s.auth.Middleware())
-	protected.GET("/cart", func(c *gin.Context) {
-		userID, _ := c.Get("user_id")
-		email, _ := c.Get("email")
-		name, _ := c.Get("name")
-		c.JSON(http.StatusOK, gin.H{
-			"message": "This is a protected cart endpoint",
-			"user": gin.H{
-				"id":    userID,
-				"email": email,
-				"name":  name,
-			},
-		})
+	protected.GET("/cart", s.getCartHandler)
+	protected.POST("/cart", s.setCartHandler)
+	protected.GET("/me", func(c *gin.Context) {
+		c.JSON(http.StatusOK, gin.H{"user_id": c.GetString("user_id")})
 	})
-
 	return r
-}
-
-func (s *Server) HelloWorldHandler(c *gin.Context) {
-	resp := make(map[string]string)
-	resp["message"] = "Hello World"
-
-	c.JSON(http.StatusOK, resp)
 }
 
 func (s *Server) healthHandler(c *gin.Context) {

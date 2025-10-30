@@ -2,8 +2,11 @@ package database
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
+	"io"
 	"log"
+	"net/http"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -13,7 +16,6 @@ import (
 	_ "github.com/joho/godotenv/autoload"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
-	"gorm.io/gorm/logger"
 )
 
 type User struct {
@@ -25,9 +27,54 @@ type User struct {
 	UpdatedAt    time.Time
 }
 
+type Cart struct {
+	ID        string `gorm:"primaryKey"`
+	UserID    string `gorm:"uniqueIndex;not null;foreignKey:ID;references:User.ID"`
+	CreatedAt time.Time
+	UpdatedAt time.Time
+
+	CartItems []CartItem `gorm:"foreignKey:CartID;constraint:OnDelete:CASCADE;"`
+}
+
+type Product struct {
+	ID          int `gorm:"primaryKey"`
+	Title       string
+	Price       float64
+	Description string
+	Category    string
+	Image       string
+	Rating      string
+	CreatedAt   time.Time
+	UpdatedAt   time.Time
+}
+
+type CartItem struct {
+	ID        string  `gorm:"primaryKey"`
+	CartID    string  `gorm:"index;not null;foreignKey:ID;references:Cart.ID"`
+	ProductID int     `gorm:"not null"`
+	Quantity  int     `gorm:"not null"`
+	Product   Product `gorm:"foreignKey:ProductID;references:ID"`
+	CreatedAt time.Time
+	UpdatedAt time.Time
+}
+
 func (u *User) BeforeCreate(tx *gorm.DB) error {
 	if u.ID == "" {
 		u.ID = uuid.New().String()
+	}
+	return nil
+}
+
+func (c *Cart) BeforeCreate(tx *gorm.DB) error {
+	if c.ID == "" {
+		c.ID = uuid.New().String()
+	}
+	return nil
+}
+
+func (ci *CartItem) BeforeCreate(tx *gorm.DB) error {
+	if ci.ID == "" {
+		ci.ID = uuid.New().String()
 	}
 	return nil
 }
@@ -51,18 +98,18 @@ func New() *gorm.DB {
 		dbPath = filepath.Join(wd, dbPath)
 	}
 
-	db, err := gorm.Open(sqlite.Open(dbPath+"?mode=rwc&cache=shared"), &gorm.Config{
-		Logger: logger.Default.LogMode(logger.Info),
-	})
+	db, err := gorm.Open(sqlite.Open(dbPath), &gorm.Config{})
 	if err != nil {
 		log.Fatalf("failed to connect to database: %v", err)
 	}
 
 	dbInstance = db
 
-	if err := db.AutoMigrate(&User{}); err != nil {
+	if err := db.AutoMigrate(&User{}, &Product{}, &Cart{}, &CartItem{}); err != nil {
 		log.Printf("migration error: %v", err)
 	}
+
+	seedProducts(db)
 
 	return dbInstance
 }
@@ -127,4 +174,55 @@ func Close() error {
 		return err
 	}
 	return sqlDB.Close()
+}
+
+func seedProducts(db *gorm.DB) {
+	type FakeStoreProduct struct {
+		ID       int     `json:"id"`
+		Title    string  `json:"title"`
+		Price    float64 `json:"price"`
+		Desc     string  `json:"description"`
+		Category string  `json:"category"`
+		Image    string  `json:"image"`
+		Rating   struct {
+			Rate  float64 `json:"rate"`
+			Count int     `json:"count"`
+		} `json:"rating"`
+	}
+
+	res, err := http.Get("https://fakestoreapi.com/products")
+	if err != nil {
+		log.Printf("error fetching products from fakestoreapi: %v", err)
+		return
+	}
+	defer res.Body.Close()
+
+	body, err := io.ReadAll(res.Body)
+	if err != nil {
+		log.Printf("error reading response body: %v", err)
+		return
+	}
+
+	var fakeStoreProducts []FakeStoreProduct
+	if err := json.Unmarshal(body, &fakeStoreProducts); err != nil {
+		log.Printf("error unmarshaling products: %v", err)
+		return
+	}
+
+	for _, fsp := range fakeStoreProducts {
+		product := Product{
+			ID:          fsp.ID,
+			Title:       fsp.Title,
+			Price:       fsp.Price,
+			Description: fsp.Desc,
+			Category:    fsp.Category,
+			Image:       fsp.Image,
+		}
+
+		if err := db.Where("id = ?", product.ID).FirstOrCreate(&product).Error; err != nil {
+			log.Printf("error seeding product %d: %v", product.ID, err)
+		}
+	}
+
+	log.Printf("seeded %d products from fakestoreapi", len(fakeStoreProducts))
 }
