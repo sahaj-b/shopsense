@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useRef, useState } from "react";
 import { useAuth } from "./authContext";
 import { getCartItemsApi, setCartItemsApi } from "./cart.service";
 
@@ -29,6 +29,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const [initiated, setInitiated] = useState(false);
   const [retryCount, setRetryCount] = useState(0);
   const { user } = useAuth();
+  const prevUserRef = useRef<typeof user>(null);
 
   useEffect(() => {
     const stored = localStorage.getItem("cart");
@@ -70,6 +71,14 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       if (timeoutId) clearTimeout(timeoutId);
     };
   }, [items, user, initiated]);
+
+  useEffect(() => {
+    if (initiated && user === null && prevUserRef.current !== null) {
+      clearCart();
+      localStorage.removeItem("cart");
+    }
+    prevUserRef.current = user;
+  }, [user, initiated]);
 
   const addItem = (
     product: Omit<CartItem, "quantity">,
