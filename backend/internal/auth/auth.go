@@ -44,7 +44,8 @@ func NewAuth(db *gorm.DB) *Auth {
 		Path:     "/",
 		MaxAge:   86400 * 30,
 		HttpOnly: true,
-		SameSite: http.SameSiteLaxMode,
+		Secure:   true,
+		SameSite: http.SameSiteNoneMode,
 	}
 
 	return &Auth{store: store, db: db}
