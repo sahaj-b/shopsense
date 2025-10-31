@@ -1,6 +1,6 @@
 import type { CartItem } from "./cartContext";
 
-const API_BASE = "http://localhost:3001";
+const API_URL = process.env.API_URL;
 
 interface ApiCartItem {
   ID: string;
@@ -19,7 +19,7 @@ interface ApiCartItem {
 }
 
 export async function getCartItemsApi(): Promise<CartItem[]> {
-  const res = await fetch(`${API_BASE}/cart`, {
+  const res = await fetch(`${API_URL}/cart`, {
     credentials: "include",
   });
   if (!res.ok) throw new Error("Failed to fetch cart items");
@@ -42,7 +42,7 @@ export async function setCartItemsApi(items: CartItem[]) {
     productId: item.id,
     quantity: item.quantity,
   }));
-  const res = await fetch(`${API_BASE}/cart`, {
+  const res = await fetch(`${API_URL}/cart`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     credentials: "include",

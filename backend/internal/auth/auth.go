@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strings"
 
 	"backend/internal/database"
 	"github.com/gin-gonic/gin"
@@ -108,7 +109,7 @@ func (a *Auth) Register(c *gin.Context) {
 	}
 
 	if err := a.db.Create(user).Error; err != nil {
-		if err.Error() == "UNIQUE constraint failed: users.email" {
+		if strings.Contains(err.Error(), "UNIQUE constraint failed") {
 			c.JSON(http.StatusConflict, gin.H{"error": "Email already exists"})
 		} else {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to register"})

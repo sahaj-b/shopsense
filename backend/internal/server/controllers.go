@@ -21,7 +21,6 @@ type SetCartRequest struct {
 }
 
 func (s *Server) getCartHandler(c *gin.Context) {
-	log.Println("############# CART GET HANDLER CALLED #############")
 	userID, _ := c.Get("user_id")
 	log.Printf("User ID: %v", userID)
 	var cart database.Cart
