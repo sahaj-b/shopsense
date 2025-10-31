@@ -18,8 +18,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "ShopSense - Shop Smart",
-  description: "Your favorite ecommerce destination",
+  title: "ShopSense",
+  description: "Smooth aah ecommerce app",
 };
 
 export default function RootLayout({
