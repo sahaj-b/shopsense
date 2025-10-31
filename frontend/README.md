@@ -12,11 +12,11 @@ E-commerce frontend with smooth animations, using view transition API, React's c
 ## Running
 ```bash
 bun install
-bun dev      # start dev server (http://localhost:3000)
-bun build    # production build
-bun start    # run production build
-bun lint     # check code
-bun format   # format code
+bun run dev      # start dev server (http://localhost:3000)
+bun run build    # production build
+bun run start    # run production build
+bun run lint     # check code
+bun run format   # format code
 ```
 
 ## Structure

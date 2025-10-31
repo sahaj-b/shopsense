@@ -28,7 +28,9 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
   const toggleTheme = () => {
     const newTheme = theme === "light" ? "dark" : "light";
-    if (!document.startViewTransition) {
+    const isSmallScreen = window.matchMedia("(max-width: 767px)").matches;
+
+    if (!document.startViewTransition || isSmallScreen) {
       setTheme(newTheme);
       document.body.classList.toggle("dark", newTheme === "dark");
       return;

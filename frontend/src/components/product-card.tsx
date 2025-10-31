@@ -38,7 +38,7 @@ export function ProductCard({ product }: ProductCardProps) {
 
   return (
     <Card className="flex flex-col h-full overflow-hidden hover:shadow-lg transition-shadow">
-      <Link href={`/products/${product.id}`} className="shrink-0">
+      <Link href={`/products/${product.id}`} className="shrink-0" prefetch>
         <ViewTransition name={`product-image-${product.id}`}>
           <div className="relative h-56 w-full bg-muted overflow-hidden">
             <Image

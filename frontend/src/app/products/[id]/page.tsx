@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useFlyToCart } from "@/hooks/useFlyToCart";
 import { useCart } from "@/lib/cartContext";
-import { type Product, useProductById } from "@/lib/query";
+import { useProductById } from "@/lib/query";
 
 export default function ProductPage() {
   const params = useParams();
@@ -58,7 +58,7 @@ export default function ProductPage() {
         <p className="text-lg text-muted-foreground">
           {error ? "Failed to load product" : "Product not found"}
         </p>
-        <Link href="/">
+        <Link href="/" prefetch>
           <Button>Back to Shop</Button>
         </Link>
       </div>

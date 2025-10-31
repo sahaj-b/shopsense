@@ -296,6 +296,21 @@
   }
 }
 
+/* @media (min-width: 768px) { */
+/*   ::view-transition-new(root) { */
+/*     mask-size: 10%; */
+/*   } */
+/**/
+/*   @keyframes expand-tshirt-mask { */
+/*     from { */
+/*       mask-size: 0%; */
+/*     } */
+/*     to { */
+/*       mask-size: 225%; */
+/*     } */
+/*   } */
+/* } */
+
 @keyframes jiggle {
   0%,
   100% {
