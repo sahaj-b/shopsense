@@ -46,6 +46,22 @@ function FlyingPlusOne({
         fill: "forwards",
       },
     ).onfinish = onEnd;
+    const iconEl = document.querySelector("[data-cart-icon]") as HTMLElement;
+    if (iconEl) {
+      iconEl.animate(
+        [
+          { transform: "translate(0, 0)" },
+          { transform: "translate(2px, -2px)", offset: 0.33 },
+          { transform: "translate(-1px, 1px)", offset: 0.66 },
+          { transform: "translate(0, 0)" },
+        ],
+        {
+          duration: 300,
+          easing: "ease-out",
+          delay: 500,
+        },
+      );
+    }
   }, [startX, startY, endX, endY]);
 
   return (
@@ -76,7 +92,7 @@ export function useFlyToCart() {
     const buttonCenterX = buttonRect.left + buttonRect.width / 2;
     const buttonCenterY = buttonRect.top + buttonRect.height / 2;
 
-    const cartBtn = document.querySelector("[data-cart-icon]") as HTMLElement;
+    const cartBtn = document.querySelector("[data-cart-btn]") as HTMLElement;
     if (cartBtn) {
       const cartRect = cartBtn.getBoundingClientRect();
       const cartCenterX = cartRect.left + cartRect.width / 2;

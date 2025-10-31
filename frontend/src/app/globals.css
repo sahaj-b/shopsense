@@ -295,3 +295,16 @@
     mask-size: 225%;
   }
 }
+
+@keyframes jiggle {
+  0%,
+  100% {
+    transform: translate(0, 0);
+  }
+  35% {
+    transform: translate(2px, 2px);
+  }
+  60% {
+    transform: translate(-1px, -1px);
+  }
+}
