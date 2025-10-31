@@ -8,7 +8,6 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"path/filepath"
 	"strconv"
 	"time"
 
@@ -90,13 +89,6 @@ func New() *gorm.DB {
 	}
 
 	dbPath := dburl
-	if !filepath.IsAbs(dbPath) {
-		wd, err := os.Getwd()
-		if err != nil {
-			log.Fatalf("failed to get working directory: %v", err)
-		}
-		dbPath = filepath.Join(wd, dbPath)
-	}
 
 	db, err := gorm.Open(sqlite.Open(dbPath), &gorm.Config{})
 	if err != nil {
