@@ -8,13 +8,14 @@ interface ApiCartItem {
   ProductID: number;
   Quantity: number;
   Product: {
-    ID: number;
-    Title: string;
-    Price: number;
-    Image: string;
-    Description?: string;
-    Category?: string;
-    Rating?: string;
+    id: number;
+    title: string;
+    price: number;
+    image: string;
+    description?: string;
+    category?: string;
+    rating?: number;
+    rateCount?: number;
   };
 }
 
@@ -28,13 +29,15 @@ export async function getCartItemsApi(): Promise<CartItem[]> {
   };
   if (!resJson.cart) return [];
 
-  return (resJson.cart.CartItems ?? []).map((item) => ({
-    id: item.Product.ID,
-    title: item.Product.Title,
-    price: item.Product.Price,
-    image: item.Product.Image,
+  const items = (resJson.cart.CartItems ?? []).map((item) => ({
+    id: item.Product.id,
+    title: item.Product.title,
+    price: item.Product.price,
+    image: item.Product.image,
     quantity: item.Quantity,
   }));
+
+  return items;
 }
 
 export async function setCartItemsApi(items: CartItem[]) {
@@ -42,11 +45,19 @@ export async function setCartItemsApi(items: CartItem[]) {
     productId: item.id,
     quantity: item.quantity,
   }));
+
+  const payload = { cartItems: newItems };
+
   const res = await fetch(`${API_URL}/cart`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     credentials: "include",
-    body: JSON.stringify({ cartItems: newItems }),
+    body: JSON.stringify(payload),
   });
-  if (!res.ok) throw new Error(res.statusText);
+
+  if (!res.ok) {
+    const errorText = await res.text();
+    console.error("Backend rejected cart update:", errorText);
+    throw new Error(res.statusText);
+  }
 }

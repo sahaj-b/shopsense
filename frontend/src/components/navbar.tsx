@@ -57,7 +57,7 @@ export function Navbar() {
     <>
       <nav className="fixed w-screen top-0 z-50 border-b bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="flex h-16 items-center justify-between gap-4">
+          <div className="grid grid-cols-[1fr_auto_1fr] h-16 items-center gap-4">
             <Link href="/" className="flex items-center font-bold text-xl">
               <span className="text-foreground/90"> Shop </span>
               <span className="bg-linear-to-br from-30% from-foreground/90 to-primary bg-clip-text text-transparent">
@@ -68,8 +68,8 @@ export function Navbar() {
             <form
               onSubmit={handleSearch}
               className={
-                "hidden mx-8 md:flex gap-2 items-center transition-all ease-[cubic-bezier(0.33,1.45,0.6,1)] duration-300 max-w-full min-w-10 " +
-                (searchFocus || search ? "w-1/2" : "w-1/3")
+                "hidden md:flex gap-2 items-center transition-all ease-[cubic-bezier(0.33,1.45,0.6,1)] duration-300 " +
+                (searchFocus || search ? "w-xl" : "w-sm")
               }
             >
               <InputGroup className="flex-1">
@@ -103,7 +103,7 @@ export function Navbar() {
               </Button>
             </form>
 
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-4 justify-end">
               <Button variant="outline" size="icon" onClick={toggleTheme}>
                 {theme === "light" ? (
                   <Moon className="h-5 w-5" />
@@ -211,7 +211,7 @@ export function Navbar() {
               {user ? (
                 <Button
                   onClick={handleLogout}
-                  variant="ghost"
+                  variant="secondary"
                   size="sm"
                   className="hidden sm:flex gap-2"
                 >

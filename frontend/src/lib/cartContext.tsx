@@ -33,7 +33,13 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const stored = localStorage.getItem("cart");
-    if (stored) setItems(JSON.parse(stored));
+    if (stored) {
+      const parsed = JSON.parse(stored);
+      const validItems = parsed.filter(
+        (item: CartItem) => item.id && item.title && item.price && item.image,
+      );
+      setItems(validItems);
+    }
   }, []);
 
   useEffect(() => {
@@ -47,7 +53,6 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
           console.error("Failed to fetch cart items from API:", err);
           if (retryCount < 3) {
             setRetryCount((prev) => prev + 1);
-            console.log("Retrying fetch cart items, attempt:", retryCount + 1);
             return;
           } else {
             setInitiated(true);
@@ -87,15 +92,13 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     setItems((prev) => {
       const existing = prev.find((item) => item.id === product.id);
       if (existing) {
-        const updated = prev.map((item) =>
+        return prev.map((item) =>
           item.id === product.id
             ? { ...item, quantity: item.quantity + quantity }
             : item,
         );
-        return updated;
       }
-      const newItems = [...prev, { ...product, quantity }];
-      return newItems;
+      return [...prev, { ...product, quantity }];
     });
   };
 

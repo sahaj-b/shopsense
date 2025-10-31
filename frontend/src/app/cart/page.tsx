@@ -5,7 +5,7 @@ import { AnimatePresence, motion } from "motion/react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState, ViewTransition } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useCart } from "@/lib/cartContext";
@@ -26,7 +26,9 @@ export default function CartPage() {
     return (
       <main className="min-h-screen bg-background py-12">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <h1 className="text-4xl font-bold mb-8">Shopping Cart</h1>
+          <h1 className="text-4xl font-bold text-foreground mb-8">
+            Shopping Cart
+          </h1>
           <div className="flex flex-col items-center justify-center py-12 text-center">
             <ShoppingCart className="w-16 h-16 text-muted-foreground mb-4" />
             <p className="text-lg text-muted-foreground mb-6">
@@ -121,7 +123,6 @@ function CartProductCard({
 }: CartProductCardProps) {
   return (
     <motion.div
-      key={item.id}
       layout
       exit={{ opacity: 0, translateX: -100 }}
       transition={{
@@ -129,7 +130,7 @@ function CartProductCard({
         default: { duration: 0.1 },
       }}
     >
-      <Card key={item.id} className="overflow-hidden">
+      <Card className="overflow-hidden">
         <CardContent className="p-6">
           <div className="flex gap-4">
             <div className="relative w-24 h-24 shrink-0 bg-muted rounded-lg overflow-hidden">
@@ -150,7 +151,9 @@ function CartProductCard({
                   {item.title}
                 </h3>
               </Link>
-              <p className="text-lg font-bold mb-3">${item.price.toFixed(2)}</p>
+              <p className="text-lg font-bold mb-3">
+                ${item.price?.toFixed(2) ?? "0.00"}
+              </p>
 
               <div className="flex items-center justify-between">
                 <div className="flex items-center border rounded-lg">
@@ -177,7 +180,7 @@ function CartProductCard({
 
             <div className="text-right flex flex-col justify-between items-end">
               <p className="text-lg font-bold">
-                ${(item.price * item.quantity).toFixed(2)}
+                ${((item.price ?? 0) * item.quantity).toFixed(2)}
               </p>
               <Button
                 variant="destructive"
