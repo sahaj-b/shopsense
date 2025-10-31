@@ -45,8 +45,7 @@ export function Products({
   const { filteredProducts, search, category, minRating, minReviews, sortBy } =
     useFilteredProducts(products ?? [], params);
 
-  if (isLoading || products === undefined)
-    return <ErrorState message="Loading..." />;
+  if (isLoading || products === undefined) return <ProductsSkeleton />;
   if (error) return <ErrorState message="Failed to load products" />;
 
   const updateParams = (key: string, value: string) => {
@@ -193,5 +192,25 @@ function ErrorState({ message }: { message: string }) {
     <div className="flex flex-col items-center justify-center py-12">
       <p className="text-lg text-destructive-foreground">{message}</p>
     </div>
+  );
+}
+
+function ProductsSkeleton() {
+  return (
+    <>
+      <div className="mb-8 pt-4 pb-20">
+        <h1 className="text-4xl font-bold tracking-tight animate-pulse ">
+          Loading Products...
+        </h1>
+      </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {Array.from({ length: 8 }).map((_, index) => (
+          <div
+            key={index}
+            className="animate-pulse bg-muted rounded-md h-64"
+          ></div>
+        ))}
+      </div>
+    </>
   );
 }
