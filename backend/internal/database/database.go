@@ -2,6 +2,7 @@ package database
 
 import (
 	"context"
+	"database/sql"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -13,6 +14,7 @@ import (
 
 	"github.com/google/uuid"
 	_ "github.com/joho/godotenv/autoload"
+	_ "github.com/tursodatabase/libsql-client-go/libsql"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 )
@@ -79,7 +81,7 @@ func (ci *CartItem) BeforeCreate(tx *gorm.DB) error {
 }
 
 var (
-	dburl      = os.Getenv("DB_URL")
+	dbUrl      = os.Getenv("DB_URL")
 	dbInstance *gorm.DB
 )
 
@@ -88,9 +90,15 @@ func New() *gorm.DB {
 		return dbInstance
 	}
 
-	dbPath := dburl
+	dbAuthToken := os.Getenv("DB_AUTH_TOKEN")
+	fullDBURL := fmt.Sprintf("%s?authToken=%s", dbUrl, dbAuthToken)
 
-	db, err := gorm.Open(sqlite.Open(dbPath), &gorm.Config{})
+	sqlDB, err := sql.Open("libsql", fullDBURL)
+	if err != nil {
+		panic(fmt.Sprintf("Failed to open Turso database: %v", err))
+	}
+
+	db, err := gorm.Open(sqlite.Dialector{Conn: sqlDB}, &gorm.Config{})
 	if err != nil {
 		log.Fatalf("failed to connect to database: %v", err)
 	}
@@ -160,7 +168,7 @@ func Health() map[string]string {
 }
 
 func Close() error {
-	log.Printf("Disconnected from database: %s", dburl)
+	log.Printf("Disconnected from database: %s", dbUrl)
 	sqlDB, err := dbInstance.DB()
 	if err != nil {
 		return err
