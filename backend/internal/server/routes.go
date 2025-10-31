@@ -25,6 +25,9 @@ func (s *Server) RegisterRoutes() http.Handler {
 	r.POST("/auth/register", s.auth.Register)
 	r.POST("/auth/login", s.auth.Login)
 	r.POST("/auth/logout", s.auth.Logout)
+	r.GET("/products", s.getProductsHandler)
+	r.GET("/products/:id", s.getProductByIDHandler)
+
 	r.GET("/ping", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"message": "pong"})
 	})

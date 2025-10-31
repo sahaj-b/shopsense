@@ -15,13 +15,11 @@ export interface Product {
   description: string;
   category: string;
   image: string;
-  rating?: {
-    rate: number;
-    count: number;
-  };
+  rating: number;
+  rateCount: number;
 }
 
-const API_URL = "https://fakestoreapi.com";
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 export function useProducts() {
   return useQuery<Product[]>({
@@ -29,6 +27,7 @@ export function useProducts() {
     queryFn: async () => {
       const res = await fetch(`${API_URL}/products`);
       if (!res.ok) throw new Error("Failed to fetch products");
+      // console.log(res.json());
       return res.json();
     },
   });
@@ -49,28 +48,6 @@ export function useProductById(id: number) {
     },
     initialDataUpdatedAt: () => {
       return queryClient.getQueryState(["products"])?.dataUpdatedAt;
-    },
-  });
-}
-
-export function useCategories() {
-  return useQuery<string[]>({
-    queryKey: ["categories"],
-    queryFn: async () => {
-      const res = await fetch(`${API_URL}/products/categories`);
-      if (!res.ok) throw new Error("Failed to fetch categories");
-      return res.json();
-    },
-  });
-}
-
-export function useProductsByCategory(category: string) {
-  return useQuery<Product[]>({
-    queryKey: ["products", category],
-    queryFn: async () => {
-      const res = await fetch(`${API_URL}/products/category/${category}`);
-      if (!res.ok) throw new Error("Failed to fetch products by category");
-      return res.json();
     },
   });
 }

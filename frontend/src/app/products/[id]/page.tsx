@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useFlyToCart } from "@/hooks/useFlyToCart";
 import { useCart } from "@/lib/cartContext";
-import { useProductById, type Product } from "@/lib/query";
+import { type Product, useProductById } from "@/lib/query";
 
 export default function ProductPage() {
   const params = useParams();
@@ -114,10 +114,10 @@ export default function ProductPage() {
                   <div className="flex items-center gap-2 mb-4">
                     <span className="text-2xl">⭐</span>
                     <span className="text-lg font-semibold">
-                      {product.rating.rate}
+                      {product.rating}
                     </span>
                     <span className="text-muted-foreground">
-                      ({product.rating.count} reviews)
+                      ({product.rateCount} reviews)
                     </span>
                   </div>
                 )}

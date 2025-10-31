@@ -105,3 +105,29 @@ func (s *Server) setCartHandler(c *gin.Context) {
 	log.Printf("############# CART SET ############# %v", cartItems)
 	c.JSON(http.StatusOK, gin.H{"cart": cart})
 }
+
+func (s *Server) getProductsHandler(c *gin.Context) {
+	var products []database.Product
+	if err := s.db.Find(&products).Error; err != nil {
+		log.Printf("Error retrieving products: %v", err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve products"})
+		return
+	}
+	c.JSON(http.StatusOK, products)
+}
+
+func (s *Server) getProductByIDHandler(c *gin.Context) {
+	productID := c.Param("id")
+	var product database.Product
+	if err := s.db.Where("id = ?", productID).First(&product).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			c.JSON(http.StatusNotFound, gin.H{"error": "Product not found"})
+		} else {
+			log.Printf("Error retrieving product %s: %v", productID, err)
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve product"})
+		}
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"product": product})
+}

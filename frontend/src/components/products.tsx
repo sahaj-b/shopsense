@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/select";
 import { StarRating } from "@/components/ui/star-rating";
 import { useFilteredProducts } from "@/hooks/useFilteredProducts";
-import { useCategories, useProducts } from "@/lib/query";
+import { useProducts } from "@/lib/query";
 
 type FiltersProps = {
   categories?: string[];
@@ -31,7 +31,12 @@ export function Products({
 }) {
   const router = useRouter();
   const { data: products, isLoading, error } = useProducts();
-  const { data: categories } = useCategories();
+  const categories = [
+    "electronics",
+    "jewelery",
+    "men's clothing",
+    "women's clothing",
+  ];
 
   const params = new URLSearchParams(
     Object.entries(searchParams)
@@ -42,8 +47,12 @@ export function Products({
       ]),
   );
 
+  const productsArray = Array.isArray(products)
+    ? products
+    : ((products as any)?.products ?? []);
+
   const { filteredProducts, search, category, minRating, minReviews, sortBy } =
-    useFilteredProducts(products ?? [], params);
+    useFilteredProducts(productsArray, params);
 
   if (isLoading || products === undefined) return <ProductsSkeleton />;
   if (error) return <ErrorState message="Failed to load products" />;

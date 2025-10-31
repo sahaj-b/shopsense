@@ -38,13 +38,14 @@ type Cart struct {
 }
 
 type Product struct {
-	ID          int `gorm:"primaryKey"`
-	Title       string
-	Price       float64
-	Description string
-	Category    string
-	Image       string
-	Rating      string
+	ID          int     `gorm:"primaryKey" json:"id"`
+	Title       string  `json:"title"`
+	Price       float64 `json:"price"`
+	Description string  `json:"description"`
+	Category    string  `json:"category"`
+	Image       string  `json:"image"`
+	Rating      float64 `json:"rating"`
+	RateCount   int     `json:"rateCount"`
 	CreatedAt   time.Time
 	UpdatedAt   time.Time
 }
@@ -109,7 +110,7 @@ func New() *gorm.DB {
 		log.Printf("migration error: %v", err)
 	}
 
-	// seedProducts(db)
+	seedProducts(db)
 
 	return dbInstance
 }
@@ -217,6 +218,8 @@ func seedProducts(db *gorm.DB) {
 			Description: fsp.Desc,
 			Category:    fsp.Category,
 			Image:       fsp.Image,
+			Rating:      fsp.Rating.Rate,
+			RateCount:   fsp.Rating.Count,
 		}
 
 		if err := db.Where("id = ?", product.ID).FirstOrCreate(&product).Error; err != nil {

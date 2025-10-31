@@ -37,3 +37,8 @@ POST {{baseUrl}}/cart
     }
   ]
 }
+### Get Products
+GET {{baseUrl}}/products
+
+### Get Product by ID
+GET {{baseUrl}}/products/1

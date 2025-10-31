@@ -176,7 +176,6 @@ export function Navbar() {
                               setLoginOpen(true);
                               setSheetOpen(false);
                             }}
-                            variant="default"
                             className="w-full"
                           >
                             Login
@@ -223,7 +222,7 @@ export function Navbar() {
                 <div className="hidden sm:flex gap-2">
                   <Button
                     onClick={() => setLoginOpen(true)}
-                    variant="ghost"
+                    variant="secondary"
                     size="sm"
                   >
                     Login

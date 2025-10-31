@@ -27,12 +27,12 @@ export function useFilteredProducts(
   }
   if (minRating > 0) {
     filteredProducts = filteredProducts.filter(
-      (p) => p.rating && p.rating.rate >= minRating,
+      (p) => p.rating && p.rating >= minRating,
     );
   }
   if (minReviews > 0) {
     filteredProducts = filteredProducts.filter(
-      (p) => p.rating && p.rating.count >= minReviews,
+      (p) => p.rating && p.rateCount >= minReviews,
     );
   }
   switch (sortBy) {
@@ -48,12 +48,12 @@ export function useFilteredProducts(
       break;
     case "rating":
       filteredProducts = [...filteredProducts].sort(
-        (a, b) => (b.rating?.rate || 0) - (a.rating?.rate || 0),
+        (a, b) => (b.rating || 0) - (a.rating || 0),
       );
       break;
     case "reviews":
       filteredProducts = [...filteredProducts].sort(
-        (a, b) => (b.rating?.count || 0) - (a.rating?.count || 0),
+        (a, b) => (b.rateCount || 0) - (a.rateCount || 0),
       );
       break;
     default:

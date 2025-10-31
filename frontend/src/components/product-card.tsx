@@ -68,10 +68,10 @@ export function ProductCard({ product }: ProductCardProps) {
               {product.rating && (
                 <div className="flex items-center gap-1 mt-1">
                   <span className="text-xs text-muted-foreground">
-                    ⭐ {product.rating.rate}
+                    ⭐ {product.rating}
                   </span>
                   <span className="text-xs text-muted-foreground">
-                    ({product.rating.count})
+                    ({product.rateCount})
                   </span>
                 </div>
               )}
