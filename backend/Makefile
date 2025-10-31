@@ -9,6 +9,13 @@ build:
 	
 	@go build -o main cmd/api/main.go
 
+# Production build with optimizations
+build-prod:
+	@echo "Building for production..."
+
+
+	@go build -tags netgo -ldflags '-s -w' -o main cmd/api/main.go
+
 # Run the application
 run:
 	@go run cmd/api/main.go

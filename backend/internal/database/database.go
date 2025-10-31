@@ -109,7 +109,7 @@ func New() *gorm.DB {
 		log.Printf("migration error: %v", err)
 	}
 
-	seedProducts(db)
+	// seedProducts(db)
 
 	return dbInstance
 }
