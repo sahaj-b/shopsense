@@ -54,8 +54,9 @@ export function Products({
   const { filteredProducts, search, category, minRating, minReviews, sortBy } =
     useFilteredProducts(productsArray, params);
 
-  if (isLoading || products === undefined) return <ProductsSkeleton />;
   if (error) return <ErrorState message="Failed to load products" />;
+
+  if (isLoading || products === undefined) return <ProductsSkeleton />;
 
   const updateParams = (key: string, value: string) => {
     const newParams = new URLSearchParams(params);
@@ -198,8 +199,8 @@ function Filters({
 
 function ErrorState({ message }: { message: string }) {
   return (
-    <div className="flex flex-col items-center justify-center py-12">
-      <p className="text-lg text-destructive-foreground">{message}</p>
+    <div className="flex flex-col items-center justify-center py-12 bg-background">
+      <p className="text-xl text-destructive">{message}</p>
     </div>
   );
 }

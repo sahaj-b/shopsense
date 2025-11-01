@@ -26,7 +26,8 @@ export function useProducts() {
     queryKey: ["products"],
     queryFn: async () => {
       const res = await fetch(`${API_URL}/products`);
-      if (!res.ok) throw new Error("Failed to fetch products");
+      if (!res.ok)
+        throw new Error("Failed to fetch products: " + res.statusText);
       // console.log(res.json());
       return res.json();
     },
