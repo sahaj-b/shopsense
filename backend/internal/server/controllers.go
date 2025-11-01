@@ -129,5 +129,5 @@ func (s *Server) getProductByIDHandler(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"product": product})
+	c.JSON(http.StatusOK, product)
 }
