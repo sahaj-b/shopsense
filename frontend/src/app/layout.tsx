@@ -6,6 +6,7 @@ import { QueryProvider } from "@/components/query-provider";
 import { AuthProvider } from "@/lib/authContext";
 import { CartProvider } from "@/lib/cartContext";
 import { ThemeProvider } from "@/lib/themeContext";
+import { MSWProvider } from "@/components/MSWProvider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -32,16 +33,18 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-background text-foreground`}
       >
-        <QueryProvider>
-          <AuthProvider>
-            <CartProvider>
-              <ThemeProvider>
-                <NavbarWrapper />
-                {children}
-              </ThemeProvider>
-            </CartProvider>
-          </AuthProvider>
-        </QueryProvider>
+        <MSWProvider>
+          <QueryProvider>
+            <AuthProvider>
+              <CartProvider>
+                <ThemeProvider>
+                  <NavbarWrapper />
+                  {children}
+                </ThemeProvider>
+              </CartProvider>
+            </AuthProvider>
+          </QueryProvider>
+        </MSWProvider>
       </body>
     </html>
   );
