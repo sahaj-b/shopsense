@@ -1,8 +1,14 @@
-# Shopsense Backend Architecture
+# Shopsense
 
-This document outlines the high-level technical architecture, internal systems, and design decisions for the Shopsense backend service.
+## Frontend
 
-## Core Architecture
+Built on **Next.js 16** and **React 19**, focused heavily on buttery-smooth user experiences and modern APIs.
+
+- **Animations**: Utilizes React 19's new `<ViewTransition>` components to give native-like, fluid page transitions between the product list and product details. Also using the browser's raw `document.startViewTransition` API for seamless light/dark theme toggling. With `motion` for list animations.
+- **Data Fetching**: Powered by `@tanstack/react-query` for aggressive caching and optimized client-side data synchronization.
+- **Tooling**: Uses `Bun` as the package manager and `Biome` for formatting and linting.
+
+## Backend Architecture
 
 The system is built as a monolithic Go service (v1.24.3) leveraging the `gin-gonic/gin` HTTP framework. It uses a structured layout separating routing, authentication, and database layers (`internal/server`, `internal/auth`, and `internal/database`). The build process is orchestrated via a `Makefile` supporting optimized production builds (`-tags netgo -ldflags '-s -w'`) and a hot-reloading development pipeline via `air`.
 
